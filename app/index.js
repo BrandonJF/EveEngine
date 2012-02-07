@@ -1,16 +1,6 @@
 (function() {
-  var jsonData,
-    __hasProp = Object.prototype.hasOwnProperty,
+  var __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  jsonData = [
-    {
-      "id": 1,
-      "name": "FirstTask",
-      "project": "Project Alpha",
-      "notes": "This is some test data for a mock task"
-    }
-  ];
 
   this.EveEngine = (function(_super) {
 
@@ -21,14 +11,16 @@
     }
 
     EveEngine.prototype.initialize = function() {
+      this.set({
+        ProjectList: []
+      });
       $("#eveStatusHeader").html("<div>EVE ENGINE IS ONLINE</div>");
       Cufon.refresh();
-      return console.log(this.toJSON());
+      return console.log(this);
     };
 
     EveEngine.prototype.createProject = function() {
-      var ProjectAlpha;
-      return ProjectAlpha = new Project;
+      return this.ProjectAlpha = new Project;
     };
 
     return EveEngine;
@@ -43,15 +35,8 @@
       Task.__super__.constructor.apply(this, arguments);
     }
 
-    Task.prototype.defaults = {
-      name: "Name Not Set",
-      project: "Project Not Set",
-      notes: "Notes Not Set"
-    };
-
     Task.prototype.initialize = function() {
-      alert("New Task Created");
-      return console.log(this.toJSON());
+      return console.log("New Task Fetched");
     };
 
     Task.prototype.sayName = function() {
@@ -70,7 +55,7 @@
       Project.__super__.constructor.apply(this, arguments);
     }
 
-    Project.prototype.localStorage = new Store("ProjectStorage");
+    Project.prototype.url = "http://devdashapi.atomicflowtech.com/api/tasks";
 
     Project.prototype.defaults = {
       name: "Project Name Not Set"
@@ -80,9 +65,9 @@
 
     Project.prototype.initialize = function() {
       this.name = prompt("What is the name of the project?");
-      alert("New Project Created");
-      console.log(this);
-      return this.save();
+      console.log("New Project Created");
+      Eve.get("ProjectList").push(this);
+      return this.fetch();
     };
 
     return Project;
@@ -98,9 +83,7 @@
   });
 
   $('#createTaskLink').click(function() {
-    var TaskOne, TaskTwo;
-    TaskOne = new Task;
-    return TaskTwo = new Task;
+    return Eve.createTask();
   });
 
 }).call(this);
