@@ -1,6 +1,8 @@
 (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var TaskItemListView,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EveEngine = (function(_super) {
 
@@ -20,7 +22,15 @@
     };
 
     EveEngine.prototype.createProject = function() {
-      return this.ProjectAlpha = new Project;
+      return Eve.get("ProjectList").push(new Project);
+    };
+
+    EveEngine.prototype.renderTasks = function() {
+      var taskitemlistview;
+      taskitemlistview = new TaskItemListView({
+        model: Eve.get('ProjectList')[0]
+      });
+      return taskitemlistview.render();
     };
 
     return EveEngine;
@@ -64,15 +74,61 @@
     Project.prototype.model = Task;
 
     Project.prototype.initialize = function() {
-      this.name = prompt("What is the name of the project?");
       console.log("New Project Created");
-      Eve.get("ProjectList").push(this);
       return this.fetch();
     };
 
     return Project;
 
   })(Backbone.Collection);
+
+  TaskItemListView = (function(_super) {
+
+    __extends(TaskItemListView, _super);
+
+    function TaskItemListView() {
+      this._click = __bind(this._click, this);
+      TaskItemListView.__super__.constructor.apply(this, arguments);
+    }
+
+    TaskItemListView.prototype.className = 'taskListItem';
+
+    TaskItemListView.prototype.tagName = 'div';
+
+    TaskItemListView.prototype.id = "taskItem" + Math.random();
+
+    TaskItemListView.prototype.el = $("#dataDisplayContent");
+
+    TaskItemListView.prototype.events = {
+      click: '_click'
+    };
+
+    TaskItemListView.prototype.initialize = function() {
+      this.model.bind('change', this.render, this);
+      return this.model.bind('reset', this.render, this);
+    };
+
+    TaskItemListView.prototype.render = function() {
+      var el;
+      el = this.el;
+      console.log("attempting render");
+      console.log(this.model);
+      _.each(this.model.models, function(task) {
+        var html;
+        task = task.toJSON();
+        html = ich.taskListItemTemplate(task);
+        return $(el).append(html);
+      });
+      return this;
+    };
+
+    TaskItemListView.prototype._click = function() {
+      return console.log(this.model);
+    };
+
+    return TaskItemListView;
+
+  })(Backbone.View);
 
   $('#startEveLink').click(function() {
     return window.Eve = new EveEngine;
@@ -84,6 +140,10 @@
 
   $('#createTaskLink').click(function() {
     return Eve.createTask();
+  });
+
+  $('#renderTaskViewLink').click(function() {
+    return Eve.renderTasks();
   });
 
 }).call(this);
